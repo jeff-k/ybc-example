@@ -15,9 +15,6 @@ enum Msg {
 }
 
 struct Model {
-    // `ComponentLink` is like a reference to a component.
-    // It can be used to send messages to the component
-    link: ComponentLink<Self>,
     value: i64,
 }
 
@@ -25,14 +22,13 @@ impl Component for Model {
     type Message = Msg;
     type Properties = ();
 
-    fn create(_props: Self::Properties, link: ComponentLink<Self>) -> Self {
+    fn create(ctx: &Context<Self>) -> Self {
         Self {
-            link,
             value: 0,
         }
     }
 
-    fn update(&mut self, msg: Self::Message) -> ShouldRender {
+    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
             Msg::AddOne => {
                 self.value += 1;
@@ -42,23 +38,16 @@ impl Component for Model {
             }
         }
     }
-
-    fn change(&mut self, _props: Self::Properties) -> ShouldRender {
-        // Should only return "true" if new properties are different to
-        // previously received properties.
-        // This component has no properties so we will always return "false".
-        false
-    }
-
-    fn view(&self) -> Html {
+    
+    fn view(&self, ctx: &Context<Self>) -> Html {
         html! {
             <>
                 // ybc-element of type Navbar. navbrand, navstart, and navend properties are required and each expect an Html type. The yew html! macro returns this type.
                 // The `navbar-burger` section is automatically appended.
-                <ybc::Navbar navbrand=self.view_navbrand() navstart=self.view_navstart() navend=self.view_navend() />
+                <ybc::Navbar navbrand={self.view_navbrand()} navstart={self.view_navstart()} navend={self.view_navend()} />
 
                 // ybc-element of type Tile. Is a container for all other tiles that compose the main body of webpage.
-                <ybc::Tile ctx=Ancestor>
+                <ybc::Tile ctx={Ancestor}>
                     { self.view_main() }
                 </ybc::Tile>
             </>
@@ -73,20 +62,20 @@ impl Model {
             <>
                 // Tile element used to build grid layouts. 
                 // Has optional properties children: Children, classes: Option<String>, tag: String, ctx(context modifier): Option<TileCtx>, vertical: bool, and size: Option<TileSize>
-                <ybc::Tile vertical=true size=TileSize::Eight>
+                <ybc::Tile vertical=true size={TileSize::Eight}>
                     <ybc::Tile>
-                        <ybc::Tile ctx=Parent vertical=true>
-                            <ybc::Tile ctx=Child tag="article" classes=Some("notification is-primary")>
+                <ybc::Tile ctx={Parent} vertical=true>
+                <ybc::Tile ctx={Child} tag="article" classes={classes!("notification", "is-primary")}>
                                 <p class="title">{ "Vertical..." }</p>
                                 <p class="subtitle">{ "Top tile" }</p>
                             </ybc::Tile>
-                            <ybc::Tile ctx=Child tag="article" classes=Some("notification is-warning")>
+                            <ybc::Tile ctx={Child} tag="article" classes={classes!("notification", "is-warning")}>
                                 <p class="title">{ "...titles" }</p>
                                 <p class="subtitle">{ "Bottom tile" }</p>
                             </ybc::Tile>
                         </ybc::Tile>
-                        <ybc::Tile ctx=Parent>
-                            <ybc::Tile ctx=Child tag="article" classes=Some("notification is-info")>
+                        <ybc::Tile ctx={Parent}>
+                            <ybc::Tile ctx={Child} tag="article" classes={classes!("notification", "is-info")}>
                                 <p class="title">{ "Middle tile" }</p>
                                 <p class="subtitle">{ "With an image" }</p>
                                 <figure class="image is-4by3">
@@ -95,8 +84,8 @@ impl Model {
                             </ybc::Tile>
                         </ybc::Tile>
                     </ybc::Tile>
-                    <ybc::Tile ctx=Parent>
-                        <ybc::Tile ctx=Child tag="article" classes=Some("notification is-danger")>
+                    <ybc::Tile ctx={Parent}>
+                        <ybc::Tile ctx={Child} tag="article" classes={classes!("notification", "is-danger")}>
                             <p class="title">{ "Wide tile" }</p>
                             <p class="subtitle">{ "Aligned with the right tile" }</p>
                             <div class="content">
@@ -105,8 +94,8 @@ impl Model {
                         </ybc::Tile>
                     </ybc::Tile>
                 </ybc::Tile>
-                <ybc::Tile ctx=Parent>
-                    <ybc::Tile ctx=Child tag="article" classes=Some("notification is-success")>
+                <ybc::Tile ctx={Parent}>
+                    <ybc::Tile ctx={Child} tag="article" classes={classes!("notification", "is-success")}>
                         <div class="content">
                             <p class="title">{ "Tall title" }</p>
                             <p class="subtitle">{ "With even more content" }</p>
@@ -134,7 +123,7 @@ impl Model {
     fn view_navbrand(&self) -> Html {
         html! {
             <>
-                <ybc::NavbarItem tag=A>
+                <ybc::NavbarItem tag={A}>
                     <img src="https://bulma.io/images/bulma-logo.png" />
                 </ybc::NavbarItem>
             </>
@@ -144,18 +133,18 @@ impl Model {
     // Contruct Navbar navdrop Menu
     fn view_navdrop(&self) -> Html {
         html! {
-            <ybc::NavbarDropdown navlink=self.view_navlink() hoverable=true>
-                <ybc::NavbarItem tag=A>
+            <ybc::NavbarDropdown navlink={self.view_navlink()} hoverable=true>
+                <ybc::NavbarItem tag={A}>
                     { "About" }
                 </ybc::NavbarItem>
-                <ybc::NavbarItem tag=A>
+                <ybc::NavbarItem tag={A}>
                     { "Jobs" }
                 </ybc::NavbarItem>
-                <ybc::NavbarItem tag=A>
+                <ybc::NavbarItem tag={A}>
                     { "Contact" }
                 </ybc::NavbarItem>
                 <ybc::NavbarDivider />
-                <ybc::NavbarItem tag=A>
+                <ybc::NavbarItem tag={A}>
                     { "Report an issue" }
                 </ybc::NavbarItem>
             </ybc::NavbarDropdown>
@@ -166,14 +155,14 @@ impl Model {
     // Html type gets tossed into navend field of NavbarProps struct. Consult ybc Docs for more info.
     fn view_navend(&self) -> Html {
         html! {
-            <ybc::NavbarItem tag=Div>
+            <ybc::NavbarItem tag={Div}>
                 // Create div container for button groups
                 <ybc::Buttons>
                     // Button classes property accepts Option<String> type. `is-primary` here provides color styling. 
-                    <ybc::Button classes=Some("is-primary")>
+                    <ybc::Button classes={classes!("is-primary")}>
                         <strong>{ "Sign up" }</strong>
                     </ybc::Button>
-                    <ybc::Button classes=Some("is-light")>
+                    <ybc::Button classes={classes!("is-light")}>
                         { "Log in" }
                     </ybc::Button>
                 </ybc::Buttons>
@@ -194,10 +183,10 @@ impl Model {
     fn view_navstart(&self) -> Html {
         html! {
             <>
-                <ybc::NavbarItem tag=A>
+                <ybc::NavbarItem tag={A}>
                     { "Home" }
                 </ybc::NavbarItem>
-                <ybc::NavbarItem tag=A>
+                <ybc::NavbarItem tag={A}>
                     { "Documentation" }
                 </ybc::NavbarItem>
                 { self.view_navdrop() }
