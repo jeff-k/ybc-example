@@ -60,7 +60,7 @@ impl Component for Heros {
                                     <p class="subtitle">{ "With even more content" }</p>
                                     <div class="content">
                                     <ybc::Button classes={classes!("is-primary", "is-warning")}>
-                                        { "butan" }
+                                        { "button" }
                                     </ybc::Button>
 
 

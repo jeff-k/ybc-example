@@ -20,6 +20,8 @@ enum Route {
     Elements,
     #[at("/forms")]
     Forms,
+    #[at("/panel")]
+    Panel,
 }
 
 #[function_component(Components)]
@@ -46,6 +48,9 @@ fn switch(routes: &Route) -> Html {
         Route::Forms => html! {
             <pages::forms::Forms />
         },
+        Route::Panel => html! {
+            <pages::panel::Panel />
+        },
     }
 }
 
@@ -66,7 +71,17 @@ impl Component for Model {
 
                 <main>
                 <ybc::Container>
+                <ybc::Tabs>
+                <ul>
+                <li>{ "asdf" }</li>
+                <li><a>{ "item2" }</a></li>
+                <li><a><ybc::Icon classes={classes!("fas", "fa-image")} />{ "xx" }</a></li>
+                </ul>
+                </ybc::Tabs>
                     <Switch<Route> render={Switch::render(switch)} />
+                <ybc::Footer>
+                    { "footer" }
+                </ybc::Footer>
                 </ybc::Container>
                 </main>
                 // ybc-element of type Tile. Is a container for all other tiles that compose the main body of webpage.
@@ -82,8 +97,8 @@ impl Model {
     fn view_navbrand(&self) -> Html {
         html! {
             <>
-                <ybc::NavbarItem tag={A}>
-                <strong>{ "YBC" }</strong>
+                <ybc::NavbarItem tag={Div}>
+                <ybc::Title>{ "ybc" }</ybc::Title>
                 </ybc::NavbarItem>
             </>
         }
@@ -152,6 +167,10 @@ impl Model {
                 <ybc::NavbarItem tag={A} href="/forms">
                     { "Forms" }
                 </ybc::NavbarItem>
+                <ybc::NavbarItem tag={A} href="/panel">
+                    { "Panel" }
+                </ybc::NavbarItem>
+
 
                 { self.view_navdrop() }
             </>
